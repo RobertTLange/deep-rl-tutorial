@@ -10,7 +10,9 @@ import torch.multiprocessing as mp
 
 from dqn import MLP_DQN, MLP_DuelingDQN, init_dqn
 from dqn_helpers import command_line_dqn, compute_td_loss
-from general_helpers import ReplayBuffer, update_target, epsilon_by_episode, get_logging_stats, run_multiple_times, polyak_update_target
+from general_helpers import epsilon_by_episode, update_target, polyak_update_target
+from general_helpers import ReplayBuffer, NaivePrioritizedBuffer
+from general_helpers import get_logging_stats, run_multiple_times
 
 torch.manual_seed(0)
 np.random.seed(0)
@@ -27,11 +29,11 @@ def run_dqn_learning(args):
     Variable = lambda *args, **kwargs: autograd.Variable(*args, **kwargs).cuda() if USE_CUDA else autograd.Variable(*args, **kwargs)
     start = time.time()
 
-    if args.AGENT == "MLP-DOUBLE": TRAIN_DOUBLE = True
+    if args.DOUBLE: TRAIN_DOUBLE = True
     else: TRAIN_DOUBLE = False
 
     # Setup agent, replay replay_buffer, logging stats df
-    if args.AGENT == "MLP-DQN" or args.AGENT == "MLP-DOUBLE":
+    if args.AGENT == "MLP-DQN":
         agents, optimizer = init_dqn(MLP_DQN, args.L_RATE, USE_CUDA,
                                      args.INPUT_DIM, args.HIDDEN_SIZE,
                                      args.NUM_ACTIONS)

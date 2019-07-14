@@ -64,6 +64,10 @@ def command_line_dqn():
                         default=32, type=int, help='# images in training batch')
     parser.add_argument('-agent', '--AGENT', action="store",
                         default="MLP-DQN", type=str, help='Agent model')
+    parser.add_argument('-d', '--DOUBLE', action="store_true", default=False,
+                        help='Perform double Q-Learning update.')
+    parser.add_argument('-p', '--PER', action="store_true", default=False,
+                        help='Perform prioritized experience replay sampling update.')
     parser.add_argument('-capacity', '--CAPACITY', action="store",
                         default=2000, type=int, help='Storage capacity of ER buffer')
 
