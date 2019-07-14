@@ -1,0 +1,4 @@
+.ipynb_checkpoints/
+.DS_Store
+.sync-config.cson
+__pycache__
