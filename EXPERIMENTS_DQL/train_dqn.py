@@ -10,7 +10,8 @@ import torch.multiprocessing as mp
 
 from dqn import MLP_DQN, MLP_DuelingDQN, init_dqn
 from dqn_helpers import command_line_dqn, compute_td_loss
-from general_helpers import epsilon_by_episode, update_target, polyak_update_target
+from general_helpers import epsilon_by_update, beta_by_update
+from general_helpers import update_target, polyak_update_target
 from general_helpers import ReplayBuffer, NaivePrioritizedBuffer
 from general_helpers import get_logging_stats, run_multiple_times
 
@@ -42,7 +43,11 @@ def run_dqn_learning(args):
                                      args.INPUT_DIM, args.HIDDEN_SIZE,
                                      args.NUM_ACTIONS)
 
-    replay_buffer = ReplayBuffer(capacity=args.CAPACITY)
+    if not args.PER:
+        replay_buffer = ReplayBuffer(capacity=args.CAPACITY)
+    else:
+        replay_buffer = NaivePrioritizedBuffer(capacity=args.CAPACITY,
+                                               prob_alpha=args.ALPHA)
 
     reward_stats = pd.DataFrame(columns=["opt_counter", "rew_mean", "rew_sd",
                                          "rew_median", "rew_10th_p", "rew_90th_p"])
@@ -56,13 +61,18 @@ def run_dqn_learning(args):
     ep_id = 0
     # RUN TRAINING LOOP OVER EPISODES
     while opt_counter < args.NUM_UPDATES:
-        epsilon = epsilon_by_episode(ep_id + 1, args.EPS_START,
-                                     args.EPS_STOP, args.EPS_DECAY)
-
         obs = env.reset()
-
         steps = 0
+
         while steps < args.MAX_STEPS:
+            epsilon = epsilon_by_update(opt_counter + 1, args.EPS_START,
+                                         args.EPS_STOP, args.EPS_DECAY)
+            if args.PER:
+                beta = beta_by_update(opt_counter + 1, args.BETA_START,
+                                      args.BETA_STEPS)
+            else:
+                beta = None
+
             action = agents["current"].act(obs.flatten(), epsilon)
             next_obs, rew, done, _  = env.step(action)
             steps += 1
@@ -73,7 +83,7 @@ def run_dqn_learning(args):
 
             if len(replay_buffer) > args.TRAIN_BATCH_SIZE:
                 opt_counter += 1
-                loss = compute_td_loss(agents, optimizer, replay_buffer,
+                loss = compute_td_loss(agents, optimizer, replay_buffer, beta,
                                        args.TRAIN_BATCH_SIZE, args.GAMMA, Variable,
                                        TRAIN_DOUBLE)
 

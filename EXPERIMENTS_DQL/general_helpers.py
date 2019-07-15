@@ -39,20 +39,6 @@ class ReplayBuffer(object):
         ep_id, step, state, action, reward, next_state, done = zip(*random.sample(self.buffer, batch_size))
         return np.stack(state), action, reward, np.stack(next_state), done
 
-    def sample_episodes(self, batch_size):
-        ep_ids = np.random.choice(np.unique(np.array(self.buffer)[:,0]), batch_size, replace=False)
-
-        sampled_episodes = []
-        for ep in ep_ids:
-            episode_transitions = []
-            step_ids = np.where(np.array(self.buffer)[:, 0] == int(ep))
-            for step in step_ids[0]:
-                episode_transitions.append(self.buffer[int(step)])
-            # print(ep, step_ids, len(episode_transitions))
-            ep_id, step, state, action, reward, next_state, done = zip(*episode_transitions)
-            sampled_episodes.append([ep_id, step, state, action, reward, next_state, done])
-        return sampled_episodes
-
     def num_episodes(self):
         return len(np.unique(np.array(self.buffer)[:,0]))
 
@@ -68,13 +54,15 @@ class NaivePrioritizedBuffer(object):
         self.pos        = 0
         self.priorities = np.zeros((capacity,), dtype=np.float32)
 
-    def push(self, state, action, reward, next_state, done):
+    def push(self, ep_id, step, state, action, reward, next_state, done):
         max_prio = self.priorities.max() if self.buffer else 1.0
 
         if len(self.buffer) < self.capacity:
-            self.buffer.append((state, action, reward, next_state, done))
+            self.buffer.append((ep_id, step, state, action,
+                                reward, next_state, done))
         else:
-            self.buffer[self.pos] = (state, action, reward, next_state, done)
+            self.buffer[self.pos] = (ep_id, step, state, action,
+                                     reward, next_state, done)
 
         self.priorities[self.pos] = max_prio
         self.pos = (self.pos + 1) % self.capacity
@@ -89,14 +77,13 @@ class NaivePrioritizedBuffer(object):
         indices = np.random.choice(len(self.buffer), batch_size, p=probs)
         samples = [self.buffer[idx] for idx in indices]
 
-        total    = len(self.buffer)
-        weights  = (total * probs[indices]) ** (-beta)
+        N = len(self.buffer)
+        weights  = (N * probs[indices]) ** (-beta)
         weights /= weights.max()
         weights  = np.array(weights, dtype=np.float32)
-
-        batch = zip(*samples)
-        states, next_states = np.concatenate(batch[0]), np.concatenate(batch[3])
-        actions, rewards, done = batch[1], batch[2], batch[4]
+        batch = list(zip(*samples))
+        states, next_states = np.stack(batch[2]), np.stack(batch[5])
+        actions, rewards, dones = batch[3], batch[4], batch[6]
         return states, actions, rewards, next_states, dones, indices, weights
 
     def update_priorities(self, batch_indices, batch_priorities):
@@ -107,14 +94,23 @@ class NaivePrioritizedBuffer(object):
         return len(self.buffer)
 
 
-def epsilon_by_episode(eps_id, epsilon_start, epsilon_final, epsilon_decay):
+def epsilon_by_update(opt_counter, epsilon_start, epsilon_final, epsilon_decay):
+    # Exponentially decaying exploration strategy
     eps = (epsilon_final + (epsilon_start - epsilon_final)
-           * math.exp(-1. * eps_id / epsilon_decay))
+           * math.exp(-1. * opt_counter / epsilon_decay))
     return eps
+
+
+def beta_by_update(opt_counter, beta_start=0.4, beta_steps=2000):
+    # Linearly increasing temperature parameter
+    beta = min(1.0, beta_start + opt_counter * (1.0 - beta_start) / beta_steps)
+    return beta
+
 
 def update_target(current_model, target_model):
     # Transfer parameters from current model to target model
     target_model.load_state_dict(current_model.state_dict())
+
 
 def polyak_update_target(current_model, target_model, soft_tau):
     for target_param, current_param in zip(target_model.parameters(),
