@@ -190,6 +190,7 @@ def rollout_episode(agent, GAMMA, MAX_STEPS, AGENT):
 def run_multiple_times(args, run_fct):
     cpu_count = mp.cpu_count()
     gpu_count = torch.cuda.device_count()
+
     # Clone arguments into list & Distribute workload across GPUs
     args_across_workers = [copy.deepcopy(args) for r in range(args.RUN_TIMES)]
     if gpu_count > 0:
@@ -200,12 +201,12 @@ def run_multiple_times(args, run_fct):
             if gpu_counter > gpu_count-1:
                 gpu_counter = 0
 
+    # Execute different runs/random seeds in parallel
     pool = mp.Pool(cpu_count-1)
-    start_t = time.time()
     df_across_runs = pool.map(run_fct, args_across_workers)
-
-    total_t = time.time() - start_t
     pool.close()
+
+    # Post process results
     df_concat = pd.concat(df_across_runs)
     by_row_index = df_concat.groupby(df_concat.index)
     df_means, df_stds = by_row_index.mean(), by_row_index.std()
