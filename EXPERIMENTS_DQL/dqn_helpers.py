@@ -14,7 +14,7 @@ def command_line_dqn():
     parser = argparse.ArgumentParser()
     # General logging/saving and device arguments
     parser.add_argument('-roll_upd', '--ROLLOUT_EVERY', action="store",
-                        default=20, type=int,
+                        default=500, type=int,
                         help='Rollout test performance after # batch updates.')
     parser.add_argument('-n_roll', '--NUM_ROLLOUTS', action="store",
                         default=5, type=int,
@@ -23,10 +23,10 @@ def command_line_dqn():
                         default=1, type=int,
                         help='# Times to run agent learning')
     parser.add_argument('-n_upd', '--NUM_UPDATES', action="store",
-                        default=8000, type=int,
+                        default=50000, type=int,
                         help='# SGD updates/iterations to train for')
     parser.add_argument('-max_steps', '--MAX_STEPS', action="store",
-                        default=1000, type=int,
+                        default=200, type=int,
                         help='Max # of steps before episode terminated')
     parser.add_argument('-v', '--VERBOSE', action="store_true", default=False,
                         help='Get training progress printed out')
@@ -34,6 +34,8 @@ def command_line_dqn():
                         default=500, type=int,
                         help='#Episodes after which to print if verbose.')
     parser.add_argument('-s', '--SAVE', action="store_true",
+                        default=False, help='Save final agents and log')
+    parser.add_argument('-s_agent', '--SAVE_AGENT', action="store_true",
                         default=False, help='Save final agents and log')
     parser.add_argument('-device', '--device_id', action="store",
                         default=0, type=int, help='Device id on which to train')
@@ -48,7 +50,7 @@ def command_line_dqn():
                         default=4, type=int, help='Number of Actions')
 
     parser.add_argument('-gamma', '--GAMMA', action="store",
-                        default=0.9, type=float,
+                        default=0.99, type=float,
                         help='Discount factor')
     parser.add_argument('-l_r', '--L_RATE', action="store", default=0.001,
                         type=float, help='Save network and learning stats after # epochs')
@@ -59,21 +61,19 @@ def command_line_dqn():
                         default=0., type=float,
                         help='Polyak Averaging tau for target network update')
     parser.add_argument('-update_upd', '--UPDATE_EVERY', action="store",
-                        default=100, type=int,
+                        default=500, type=int,
                         help='Update target network after # batch updates')
 
     parser.add_argument('-e_start', '--EPS_START', action="store", default=1,
                         type=float, help='Start Exploration Rate')
     parser.add_argument('-e_stop', '--EPS_STOP', action="store", default=0.01,
                         type=float, help='Start Exploration Rate')
-    parser.add_argument('-e_decay', '--EPS_DECAY', action="store", default=100,
-                        type=float, help='Start Exploration Rate')
 
     parser.add_argument('-p', '--PER', action="store_true", default=False,
                         help='Perform prioritized experience replay sampling update.')
     parser.add_argument('-b_start', '--BETA_START', action="store", default=0.4,
                         type=float, help='Initial beta to start learning with.')
-    parser.add_argument('-b_steps', '--BETA_STEPS', action="store", default=2000,
+    parser.add_argument('-b_steps', '--BETA_STEPS', action="store", default=5000,
                         type=int, help='Number of steps until which beta is annealed to 1.')
     parser.add_argument('-alpha', '--ALPHA', action="store", default=0.6,
                         type=float, help='Temperature is priority Boltzmann distribution.')
@@ -83,7 +83,7 @@ def command_line_dqn():
     parser.add_argument('-d', '--DOUBLE', action="store_true", default=False,
                         help='Perform double Q-Learning update.')
     parser.add_argument('-capacity', '--CAPACITY', action="store",
-                        default=2000, type=int, help='Storage capacity of ER buffer')
+                        default=20000, type=int, help='Storage capacity of ER buffer')
 
     return parser.parse_args()
 

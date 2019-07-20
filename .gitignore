@@ -2,3 +2,4 @@
 .DS_Store
 .sync-config.cson
 __pycache__
+agents/

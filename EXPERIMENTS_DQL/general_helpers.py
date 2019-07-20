@@ -96,8 +96,7 @@ class NaivePrioritizedBuffer(object):
 
 def epsilon_by_update(opt_counter, epsilon_start, epsilon_final, epsilon_decay):
     # Exponentially decaying exploration strategy
-    eps = (epsilon_final + (epsilon_start - epsilon_final)
-           * math.exp(-1. * opt_counter / epsilon_decay))
+    eps = min(epsilon_final, epsilon_start + opt_counter * (epsilon_final - epsilon_start) / epsilon_decay)
     return eps
 
 
@@ -161,18 +160,7 @@ def rollout_episode(agent, GAMMA, MAX_STEPS, AGENT):
     steps = 0
 
     while steps < MAX_STEPS:
-        if AGENT == "Vanilla-PG":
-            obs = Variable(torch.FloatTensor(obs.flatten()).unsqueeze(0),
-                           volatile=True)
-            policy_v = agent["policy"].forward(obs)
-            action = policy_v.sample()
-        elif AGENT == "A2C":
-            obs = Variable(torch.FloatTensor(obs.flatten()).unsqueeze(0),
-                           volatile=True)
-            policy_v, value = agent(obs)
-            action = policy_v.sample()
-        else:
-            action = agent["current"].act(obs.flatten(), epsilon=0.05)
+        action = agent["current"].act(obs.flatten(), epsilon=0.05)
         next_obs, reward, done, _ = env.step(action)
         steps += 1
 

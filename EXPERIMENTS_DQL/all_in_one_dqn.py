@@ -61,16 +61,18 @@ class ReplayBuffer(object):
 def init_dqn(model, L_RATE, USE_CUDA, INPUT_DIM, HIDDEN_SIZE, NUM_ACTIONS):
     agents = {"current": model(INPUT_DIM, HIDDEN_SIZE, NUM_ACTIONS),
               "target": model(INPUT_DIM, HIDDEN_SIZE, NUM_ACTIONS)}
-
-    if USE_CUDA:
-        agents["current"] = agents["current"].cuda()
-        agents["target"] = agents["target"].cuda()
-
     optimizers = optim.Adam(params=agents["current"].parameters(), lr=L_RATE)
     return agents, optimizers
 
 def update_target(current_model, target_model):
     target_model.load_state_dict(current_model.state_dict())
+
+def polyak_update_target(current_model, target_model, soft_tau):
+    for target_param, current_param in zip(target_model.parameters(),
+                                           current_model.parameters()):
+        target_param.data.copy_(
+            target_param.data * (1. - soft_tau) + current_param.data * soft_tau
+        )
 
 def epsilon_by_episode(eps_id, epsilon_start, epsilon_final, epsilon_decay):
     eps = (epsilon_final + (epsilon_start - epsilon_final)

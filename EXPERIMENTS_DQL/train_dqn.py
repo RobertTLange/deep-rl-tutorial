@@ -66,7 +66,7 @@ def run_dqn_learning(args):
 
         while steps < args.MAX_STEPS:
             epsilon = epsilon_by_update(opt_counter + 1, args.EPS_START,
-                                         args.EPS_STOP, args.EPS_DECAY)
+                                         args.EPS_STOP, args.NUM_UPDATES)
             if args.PER:
                 beta = beta_by_update(opt_counter + 1, args.BETA_START,
                                       args.BETA_STEPS)
@@ -116,6 +116,9 @@ def run_dqn_learning(args):
                                           s_stats.loc[0, "steps_mean"]))
                 start = time.time()
 
+            if args.SAVE_AGENT and opt_counter+1 in [1, 1000, 5000, 10000, 20000, 30000]:
+                torch.save(agents["current"].state_dict(), "agents/" + str(opt_counter) + "_" + args.AGENT)
+                print("Saved agent after {} SGD updates".format(opt_counter+1))
         ep_id += 1
 
     # Save the logging dataframe
@@ -123,10 +126,6 @@ def run_dqn_learning(args):
     df_to_save = df_to_save.loc[:,~df_to_save.columns.duplicated()]
     df_to_save = df_to_save.reset_index()
 
-    # Finally save all results!
-    # if args.SAVE:
-    #     torch.save(agents["current"].state_dict(), "agents/" + str(args.NUM_UPDATES) + "_" + args.AGENT)
-    #     df_to_save.to_csv("results/"  + args.AGENT + "_" + args.STATS_FNAME)
     return df_to_save
 
 
