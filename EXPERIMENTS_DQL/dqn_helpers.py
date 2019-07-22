@@ -14,7 +14,7 @@ def command_line_dqn():
     parser = argparse.ArgumentParser()
     # General logging/saving and device arguments
     parser.add_argument('-roll_upd', '--ROLLOUT_EVERY', action="store",
-                        default=500, type=int,
+                        default=100, type=int,
                         help='Rollout test performance after # batch updates.')
     parser.add_argument('-n_roll', '--NUM_ROLLOUTS', action="store",
                         default=5, type=int,
@@ -23,7 +23,7 @@ def command_line_dqn():
                         default=1, type=int,
                         help='# Times to run agent learning')
     parser.add_argument('-n_upd', '--NUM_UPDATES', action="store",
-                        default=50000, type=int,
+                        default=80000, type=int,
                         help='# SGD updates/iterations to train for')
     parser.add_argument('-max_steps', '--MAX_STEPS', action="store",
                         default=200, type=int,
@@ -31,7 +31,7 @@ def command_line_dqn():
     parser.add_argument('-v', '--VERBOSE', action="store_true", default=False,
                         help='Get training progress printed out')
     parser.add_argument('-print', '--PRINT_EVERY', action="store",
-                        default=500, type=int,
+                        default=5000, type=int,
                         help='#Episodes after which to print if verbose.')
     parser.add_argument('-s', '--SAVE', action="store_true",
                         default=False, help='Save final agents and log')
@@ -111,7 +111,7 @@ def compute_td_loss(agents, optimizer, replay_buffer, beta,
 
     if TRAIN_DOUBLE:
         next_q_values = agents["current"](next_obs)
-        next_q_state_values = agents["target"](obs)
+        next_q_state_values = agents["target"](next_obs)
         next_q_value = next_q_state_values.gather(1, torch.max(next_q_values, 1)[1].unsqueeze(1)).squeeze(1)
     else:
         next_q_values = agents["target"](next_obs)

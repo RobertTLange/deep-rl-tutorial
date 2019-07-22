@@ -116,8 +116,8 @@ def run_dqn_learning(args):
                                           s_stats.loc[0, "steps_mean"]))
                 start = time.time()
 
-            if args.SAVE_AGENT and opt_counter+1 in [1, 1000, 5000, 10000, 20000, 30000]:
-                torch.save(agents["current"].state_dict(), "agents/" + str(opt_counter) + "_" + args.AGENT)
+            if args.SAVE_AGENT and opt_counter+1 in [10000, 100000, 500000, 1000000]:
+                torch.save(agents["current"].state_dict(), "agents/" + str(opt_counter+1) + "_" + args.AGENT)
                 print("Saved agent after {} SGD updates".format(opt_counter+1))
         ep_id += 1
 
