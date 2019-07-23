@@ -2,4 +2,4 @@
 .DS_Store
 .sync-config.cson
 __pycache__
-agents/
+Deep_Q_Learning.key

@@ -98,7 +98,3 @@ if __name__ == '__main__':
     save_fname = args.AGENT + ".mp4"
     title = "DQN Agent after {} Iterations".format(args.TITLE)
     main(LOAD_CKPT, save_fname, title)
-
-    # python enjoy_dense.py --AGENT 5000_MLP-DQN --TITLE 5000
-    # python enjoy_dense.py --AGENT 40000_MLP-DQN --TITLE 40000
-    # python enjoy_dense.py --AGENT 500000_MLP-DQN --TITLE 500000
