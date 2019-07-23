@@ -5,8 +5,7 @@ This repository contains a series of tutorials on Deep Reinforcement Learning (D
 
 ### Deep Q-Learning (July 2019)
 
-<img src="EXPERIMENTS_DQL/figures/DQN-Timeline.png" width="50%" height="50%" />
-<img src="EXPERIMENTS_DQL/movies/DQN-Gridworld.gif" width="40%" height="40%" />
+<img src="EXPERIMENTS_DQL/figures/DQN-Timeline.png" width="100%" height="100%" />
 
 * [Slides](Deep_Q_Learning.pdf): Includes DQN, Double DQN, Prioritized Experience Replay & Dueling DQNs
 * [Experiments](EXPERIMENTS_DQL): Provides code to implement all of the above.
@@ -32,5 +31,8 @@ This repository contains a series of tutorials on Deep Reinforcement Learning (D
         python enjoy_dense.py --AGENT 40000_MLP-DQN --TITLE 40000
         python enjoy_dense.py --AGENT 500000_MLP-DQN --TITLE 500000
         ```
+
+        <img src="EXPERIMENTS_DQL/movies/DQN-Gridworld.gif" width="100%" height="100%" />
+
 
 ### Deep Policy Gradients (to be continued)
