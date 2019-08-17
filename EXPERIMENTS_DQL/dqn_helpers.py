@@ -14,7 +14,7 @@ def command_line_dqn():
     parser = argparse.ArgumentParser()
     # General logging/saving and device arguments
     parser.add_argument('-roll_upd', '--ROLLOUT_EVERY', action="store",
-                        default=100, type=int,
+                        default=500, type=int,
                         help='Rollout test performance after # batch updates.')
     parser.add_argument('-n_roll', '--NUM_ROLLOUTS', action="store",
                         default=5, type=int,

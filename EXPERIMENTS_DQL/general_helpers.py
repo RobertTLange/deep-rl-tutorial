@@ -158,6 +158,7 @@ def rollout_episode(agent, GAMMA, MAX_STEPS, AGENT):
     obs = env.reset()
     episode_rew = 0
     steps = 0
+    GAMMA = 0.95
 
     while steps < MAX_STEPS:
         action = agent["current"].act(obs.flatten(), epsilon=0.05)

@@ -25,6 +25,11 @@ def init_dqn(model, L_RATE, USE_CUDA,
     agents = {"current": model(INPUT_DIM, HIDDEN_SIZE, NUM_ACTIONS),
               "target": model(INPUT_DIM, HIDDEN_SIZE, NUM_ACTIONS)}
 
+    # Copy over initial parameters to the target network
+    for target_param, param in zip(agents["target"].parameters(),
+                                   agents["current"].parameters()):
+        target_param.data.copy_(param.data)
+
     if USE_CUDA:
         agents["current"] = agents["current"].cuda()
         agents["target"] = agents["target"].cuda()
