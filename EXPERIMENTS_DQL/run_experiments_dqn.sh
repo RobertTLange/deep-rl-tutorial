@@ -1,4 +1,4 @@
-if [[ "$*" == "dqn" ]]
+if [[ "$1" == "dqn" ]]
 then
     echo "Run DQN Experiments"
     ###############################################################################
@@ -21,7 +21,7 @@ then
     CUDA_VISIBLE_DEVICES=$2 python train_dqn.py -s -n_runs 5 -update_upd 500 -fname dqn_hard_update_100 -n_upd 1500000
     CUDA_VISIBLE_DEVICES=$2 python train_dqn.py -s -n_runs 5 -soft_tau 0.01 -fname dqn_soft_update_001 -n_upd 1500000
     CUDA_VISIBLE_DEVICES=$2 python train_dqn.py -s -n_runs 5 -soft_tau 0.05 -fname dqn_soft_update_005 -n_upd 1500000
-elif [[ "$*" == "double-dqn" ]]
+elif [[ "$1" == "double-dqn" ]]
 then
     echo "Run Double DQN Experiments"
     ###############################################################################
@@ -35,7 +35,7 @@ then
     CUDA_VISIBLE_DEVICES=$2 python train_dqn.py -s -n_runs 5 --DOUBLE -gamma 0.9 -fname ddqn_gamma_09 -n_upd 1500000
     CUDA_VISIBLE_DEVICES=$2 python train_dqn.py -s -n_runs 5 --DOUBLE -gamma 0.95 -fname ddqn_gamma_095 -n_upd 1500000
     CUDA_VISIBLE_DEVICES=$2 python train_dqn.py -s -n_runs 5 --DOUBLE -gamma 0.99 -fname ddqn_gamma_099 -n_upd 1500000
-elif [[ "$*" == "per-dqn" ]]
+elif [[ "$1" == "per-dqn" ]]
 then
     echo "Run Prioritized Experience Replay Experiments"
     ###############################################################################
@@ -53,7 +53,7 @@ then
     CUDA_VISIBLE_DEVICES=$2 python train_dqn.py -s -n_runs 5 --PER -capacity 5000 -fname per_dqn_capacity_5000 -n_upd 1500000
     CUDA_VISIBLE_DEVICES=$2 python train_dqn.py -s -n_runs 5 --PER -capacity 20000 -fname per_dqn_capacity_20000 -n_upd 1500000
     CUDA_VISIBLE_DEVICES=$2 python train_dqn.py -s -n_runs 5 --PER -capacity 40000 -fname per_dqn_capacity_40000 -n_upd 1500000
-elif [[ "$*" == "dueling-dqn" ]]
+elif [[ "$1" == "dueling-dqn" ]]
 then
     echo "Run Dueling DQN Experiments"
     ###############################################################################
@@ -68,5 +68,6 @@ then
     CUDA_VISIBLE_DEVICES=$2 python train_dqn.py -s -n_runs 5 -agent MLP-DUELING --DOUBLE -fname double_dueling_dqn
     CUDA_VISIBLE_DEVICES=$2 python train_dqn.py -s -n_runs 5 -agent MLP-DUELING --PER -fname per_dueling_dqn
     CUDA_VISIBLE_DEVICES=$2 python train_dqn.py -s -n_runs 5 -agent MLP-DUELING --DOUBLE --PER -fname per_double_dueling_dqn
-
+else
+    echo "Provide valid argument to bash script"
 fi
