@@ -1,5 +1,5 @@
 # A Tutorial Series on Deep Reinforcement Learning
-## Author: Robert Tjarko Lange (ECN Berlin)
+## Author: Robert Tjarko Lange (TU Berlin)
 
 This repository contains a series of tutorials on Deep Reinforcement Learning (DRL). This includes slides as well as experiments. Going forward I plan on adding exercises as well as complementary blog posts. So stay tuned!
 
