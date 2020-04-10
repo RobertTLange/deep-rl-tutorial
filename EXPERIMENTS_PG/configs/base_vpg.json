@@ -1,27 +1,26 @@
 {
-"train_config": {"agent_name": "VPG",          # Class of agents to train
-                 "seed_id": 0,                  # Training seed for init
-                 "num_train_updates": 10000,
+"train_config": {"agent_name": "VPG",         # Class of agents to train
+                 "seed_id": 0,                # Training seed for init
+                 "num_train_updates": 10000,  # Batch updates to train with
+                 "env_name": "Pendulum-v0",   # Name of training environment
+                 "device_name": "cpu",        # Device on which to run sim
                  # Optimization-spec. hyperparameters
                  "loss_type": "vpg",
                  "opt_type": "Adam",
-                 "l_rate": 1e-5,
-                 "batch_size": 32,
-                 "optimization_steps_in_mini_epoch": 10,
-                 # VPG-spec. hyperparams ()
-                 "exploration_anneal_in_steps": 700000,
-                 "exploration_start": 1,
-                 "exploration_final": 0.1,
-                 "exploration_anneal_type": "exponential",
+                 "l_rate": 1e-4,
+                 "batch_size": 16,           # Batchsize - divides by threads
+                 "num_threads": 16,          # Threads
+                 "optimization_steps_in_mini_epoch": 1,   # Updates per batch
+                 # VPG-spec. hyperparams (policy type)
+                 "entropy_beta": 0.02,
+                 "clip_action_to_range": 1,
+                 "policy_type": "gaussian",
                  # MDP-spec. hyperparams (Steps, Discount)
-                 "max_steps_in_episode": 500,
-                 "train_discount_factor": 0.98,
-                 "test_discount_factor": 0.98,
+                 "max_steps_in_episode": 200,
+                 "train_discount_factor": 1,
+                 "test_discount_factor": 1,
                  # Logging-spec. hyperparams (When/how much)
-                 "evaluate_every_optimization_steps": 5000,
-                 "num_test_episodes": 10,
-                 # Environment-spec. hyperparams
-                 "env_name": "Swarm-Goal-v0",   # Name of training environment
+                 "evaluate_every_optimization_steps": 100
                 },
 "log_config": {"time_to_track": ["ep_counter", "optim_counter",
                                 "step_counter", "t_since_last_opt"],
@@ -35,12 +34,12 @@
                "time_to_print": ["optim_counter", "t_since_last_opt"],
                "what_to_print": ["rew_mean", "rew_median",
                                  "steps_mean", "steps_median", "success_rate"]},
-"net_config": {"input_dim": [4],
-               "layers_info": [["linear", 64, 1],
+"net_config": {"input_dim": [1, 3],
+               "layers_info": [["flatten"],
                               ["linear", 32, 1],
-                              ["linear", 2, 1]],
+                              ["linear", 32, 1],
+                              ["linear", 1, 1]],
                 "output_act": "identity",
                 "hidden_act": "relu",
-                "dropout": 0.0,
-                "batch_norm": 0}
+                "learn_constant": 1}
 }

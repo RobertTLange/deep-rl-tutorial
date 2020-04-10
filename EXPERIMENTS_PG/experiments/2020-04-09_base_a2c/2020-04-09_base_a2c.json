@@ -1,0 +1,62 @@
+{
+"train_config": {"agent_name": "A2C",         # Class of agents to train
+                 "seed_id": 0,                # Training seed for init
+                 "num_train_updates": 20000,  # Batch updates to train with
+                 "env_name": "Pendulum-v0",   # Name of training environment
+                 "device_name": "cpu",        # Device on which to run sim
+                 # Optimization-spec. hyperparameters
+                 "loss_type": "a2c",
+                 "opt_type": {"policy": "Adam",
+                              "value": "Adam"},
+                 "l_rate": {"policy": 1e-5,
+                            "value": 1e-5},
+                 "batch_size": 32,           # Divides by threads for sync
+                 "num_threads": 16,          # Threads
+                 "steps_in_trajectory": 20,
+                 "optimization_steps_in_mini_epoch": 1,   # Updates per batch
+                 # A2C-spec. hyperparams (policy type)
+                 "return_type": "advantage-critic",                # vanilla/gae
+                 "shared_torso": 0,
+                 "entropy_beta": 0.02,
+                 "clip_action_to_range": 1,
+                 "policy_type": "gaussian",
+                 # MDP-spec. hyperparams (Steps, Discount)
+                 "max_steps_in_episode": 200,
+                 "train_discount_factor": 1,
+                 "test_discount_factor": 1,
+                 # Logging-spec. hyperparams (When/how much)
+                 "evaluate_every_optimization_steps": 100
+                },
+"log_config": {"time_to_track": ["ep_counter", "optim_counter",
+                                "step_counter", "t_since_last_opt"],
+               "what_to_track": ["rew_mean", "rew_sd", "rew_median",
+                                 "rew_10th_p", "rew_90th_p",
+                                 "steps_mean", "steps_sd", "steps_median",
+                                 "steps_10th_p", "steps_90th_p",
+                                 "success_rate", "loss"],
+               "experiment_dir": "experiments/",
+               "seed_id": 0,
+               "time_to_print": ["optim_counter", "t_since_last_opt"],
+               "what_to_print": ["rew_mean", "rew_median",
+                                 "steps_mean", "steps_median", "success_rate"]},
+"net_config": {# Specify the actor architecture
+                "policy": {"input_dim": [1, 3],
+                           "layers_info": [["flatten"],
+                                          ["linear", 32, 1],
+                                          ["linear", 32, 1],
+                                          ["linear", 1, 1]],
+                            "output_act": "identity",
+                            "hidden_act": "relu",
+                            "learn_constant": 1    # whether to learn log std
+                        },
+                # Specify the critic architecture
+                "value": {"input_dim": [1, 3],
+                           "layers_info": [["flatten"],
+                                          ["linear", 32, 1],
+                                          ["linear", 32, 1],
+                                          ["linear", 1, 1]],
+                            "output_act": "identity",
+                            "hidden_act": "relu",
+                            "dropout": 0.0,
+                            "batch_norm": 0}}
+}
